@@ -2,8 +2,11 @@ CREATE DATABASE projects;
 
 USE projects;
 
+-- Data Cleaning steps
+
 SELECT * FROM hr;
 
+-- Set emp_id column to max limit of 20 chars
 ALTER TABLE hr
 CHANGE COLUMN id emp_id VARCHAR(20) NULL; 
 
@@ -12,8 +15,10 @@ DESCRIBE hr;
 SELECT termdate
 FROM hr;
 
+-- Lets us make updates to data
 SET sql_safe_updates = 0;
 
+-- Convert birthdate column to desired date format
 UPDATE hr
 SET birthdate = CASE
 WHEN birthdate LIKE "%-%" THEN date_format(str_to_date(birthdate, '%m-%d-%Y'), "%Y-%m-%d")
@@ -21,9 +26,11 @@ WHEN birthdate LIKE "%/%" THEN date_format(str_to_date(birthdate, '%m/%d/%Y'), "
 ELSE NULL
 END; 
 
+-- Set datatype to DATE
 ALTER TABLE hr
 MODIFY COLUMN birthdate DATE;
 
+-- Convert birthdate column to desired date format
 UPDATE hr
 SET hire_date = CASE
 WHEN hire_date LIKE "%-%" THEN date_format(str_to_date(hire_date, '%m-%d-%Y'), "%Y-%m-%d")
@@ -31,18 +38,23 @@ WHEN hire_date LIKE "%/%" THEN date_format(str_to_date(hire_date, '%m/%d/%Y'), "
 ELSE NULL
 END; 
 
+-- Allows date comparision
 SET @@SESSION.sql_mode='ALLOW_INVALID_DATES';
 
+-- Convert termdate column to desired date format
 UPDATE hr
 SET termdate = date(str_to_date(termdate,'%Y-%m-%d %H:%i:%s UTC'))
 WHERE termdate IS NOT NULL AND termdate <> " ";
 
+-- Set datatype to DATE
 ALTER TABLE hr
 MODIFY COLUMN termdate DATE;
 
+-- Set datatype to DATE
 ALTER TABLE hr
 MODIFY COLUMN hire_date DATE;
 
+-- Set datatype to INT
 ALTER TABLE hr
 ADD COLUMN age INT; 
 
@@ -53,6 +65,7 @@ SELECT COUNT(*)
 FROM hr
 WHERE age < 18;
 
+-- Add age column to table
 UPDATE hr
 SET age = timestampdiff(YEAR, birthdate, CURDATE());
 
